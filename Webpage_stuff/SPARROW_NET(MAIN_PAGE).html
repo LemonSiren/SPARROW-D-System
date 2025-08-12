@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>SPARROW.Net</title>
+
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://pyscript.net/releases/2025.7.2/core.css" />
+    <script type="module" src="https://pyscript.net/releases/2025.7.2/core.js"></script>
+
+
+<style>
+    h2 {
+        color: Purple;
+        text-align: right; /* Move text to the right */
+        text-shadow: 2px 2px 4px #000000;
+        text-decoration: underline;
+        text-decoration-color: #FF00FF;
+        text-decoration-style: solid;
+        text-decoration-thickness: 2px;
+        font-size: 15px;
+        font-family: Arial, sans-serif;
+        position: absolute;   /* Position absolutely */
+        top: 10px;            /* Distance from top */
+        right: 20px;          /* Distance from right */
+        margin: 0;
+    }
+
+
+
+
+    body {
+        background-image: url("Cosmonerds astronomy club_20250811_193204_0000 (1).png");
+        background-size: contain; /* Ensures the whole image is visible */
+        background-repeat: no-repeat;
+        background-position: center center;
+        background-color: #000; /* Set background to black */
+        color: White;
+        min-height: 100vh; /* Ensures body fills the viewport */
+    }
+
+
+
+
+        .sidemenu {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #222;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+        .sidemenu a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 22px;
+            color: #fff;
+            display: block;
+            transition: 0.2s;
+        }
+        .sidemenu a:hover {
+            background-color: #000000ff;
+        }
+        .sidemenu .closebtn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 36px;
+            color: #fff;
+        }
+        #openMenuBtn {
+            font-size: 20px;
+            cursor: pointer;
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 20px;
+        }
+    </style>
+
+</head>
+<body>
+
+
+
+<script>
+function createPopOutMenu() {
+    if (!document.getElementById('mySidemenu')) {
+        const menuHTML = `
+            <button id="openMenuBtn" onclick="openMenu()">☰ Open Menu</button>
+            <div id="mySidemenu" class="sidemenu">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">&times;</a>
+                <a href="#">Home</a>
+                <a href="#">Monthly Report</a>
+                <a href="Services(SPARROW).html">Services</a>
+                <a href="#">Contact</a>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('afterbegin', menuHTML);
+        window.openMenu = function() {
+            document.getElementById("mySidemenu").style.width = "250px";
+        }
+        window.closeMenu = function() {
+            document.getElementById("mySidemenu").style.width = "0";
+        }
+    }
+}
+createPopOutMenu();
+</script>
+
+<h2> SPARROW_NET-V:0.1 </h2>
+
+</body>
+</html>

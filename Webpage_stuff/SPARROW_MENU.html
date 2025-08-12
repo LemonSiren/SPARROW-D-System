@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Reusable Pop-out Menu</title>
+    <style>
+        .sidemenu {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            background-color: #222;
+            overflow-x: hidden;
+            transition: 0.3s;
+            padding-top: 60px;
+        }
+        .sidemenu a {
+            padding: 8px 8px 8px 32px;
+            text-decoration: none;
+            font-size: 22px;
+            color: #fff;
+            display: block;
+            transition: 0.2s;
+        }
+        .sidemenu a:hover {
+            background-color: #575757;
+        }
+        .sidemenu .closebtn {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 36px;
+            color: #fff;
+        }
+        #openMenuBtn {
+            font-size: 20px;
+            cursor: pointer;
+            background: #222;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            margin: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<script>
+function createPopOutMenu() {
+    // Only add if not already present
+    if (!document.getElementById('mySidemenu')) {
+        // Create menu HTML
+        const menuHTML = `
+            <button id="openMenuBtn" onclick="openMenu()">☰ Open Menu</button>
+            <div id="mySidemenu" class="sidemenu">
+                <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">&times;</a>
+                <a href="#">Home</a>
+                <a href="#">About</a>
+                <a href="#">Services</a>
+                <a href="#">Contact</a>
+            </div>
+        `;
+        // Insert into body
+        document.body.insertAdjacentHTML('afterbegin', menuHTML);
+
+        // Add menu functions to window so HTML onclick works
+        window.openMenu = function() {
+            document.getElementById("mySidemenu").style.width = "250px";
+        }
+        window.closeMenu = function() {
+            document.getElementById("mySidemenu").style.width = "0";
+        }
+    }
+}
+
+// Example usage: call this function from another script
+createPopOutMenu();
+</script>
+
+</body>
+</html>
