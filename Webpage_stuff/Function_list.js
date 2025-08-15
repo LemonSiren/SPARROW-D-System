@@ -47,7 +47,7 @@ function createWelcomeWidget(options = {}) {
     }
 }
 
-
+/*Unuseable as of now */
 function createLiveDataWidget(options = {}) {
     if (!document.getElementById('liveDataWidget')) {
         const widgetHTML = `
