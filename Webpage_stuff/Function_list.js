@@ -92,8 +92,8 @@ function createVerticalSubMenu(options = {}) {
                 left: 0;
                 z-index: 2;
                 font-size: 18px;
-                background: #2ecc40;
-                color: #fff;
+                background:linear-gradient(135deg, rgba(46,204,64,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(255,230,0,0.7) 100%);
+                color: #000000ff;
                 border: none;
                 padding: 10px 20px;
                 border-radius: 0 8px 8px 0;
