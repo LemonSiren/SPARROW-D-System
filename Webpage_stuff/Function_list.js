@@ -82,3 +82,55 @@ function createLiveDataWidget(options = {}) {
             });
     }
 }
+
+function createVerticalSubMenu(options = {}) {
+    if (!document.getElementById('verticalSubMenu')) {
+        const submenuHTML = `
+            <button id="openSubMenuBtn" onclick="openSubMenu()" style="
+                position: fixed;
+                top: 80px;
+                left: 0;
+                z-index: 2;
+                font-size: 18px;
+                background: #2ecc40;
+                color: #fff;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 0 8px 8px 0;
+                cursor: pointer;
+            ">☰ [Placeholder]</button>
+            <div id="verticalSubMenu" style="
+                height: 100%;
+                width: 0;
+                position: fixed;
+                z-index: 2;
+                top: 0;
+                left: 0;
+                background: linear-gradient(180deg, rgba(46,204,64,0.7) 0%, rgba(255,255,255,0.7) 80%, rgba(255,230,0,0.7) 100%);
+                overflow-x: hidden;
+                transition: 0.3s;
+                padding-top: 100px;
+                box-shadow: 2px 0 8px rgba(0,0,0,0.2);
+            ">
+                <a href="javascript:void(0)" style="
+                    position: absolute;
+                    top: 20px;
+                    right: 20px;
+                    font-size: 36px;
+                    color: #222;
+                    text-decoration: none;
+                " onclick="closeSubMenu()">&times;</a>
+                <a href="#" style="display:block;padding:16px 32px;color:#222;font-size:20px;text-decoration:none;">${options.item1 || "Subitem 1"}</a>
+                <a href="#" style="display:block;padding:16px 32px;color:#222;font-size:20px;text-decoration:none;">${options.item2 || "Subitem 2"}</a>
+                <a href="#" style="display:block;padding:16px 32px;color:#222;font-size:20px;text-decoration:none;">${options.item3 || "Subitem 3"}</a>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('afterbegin', submenuHTML);
+        window.openSubMenu = function() {
+            document.getElementById("verticalSubMenu").style.width = "220px";
+        }
+        window.closeSubMenu = function() {
+            document.getElementById("verticalSubMenu").style.width = "0";
+        }
+    }
+}
