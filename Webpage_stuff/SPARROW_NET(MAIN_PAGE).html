@@ -84,6 +84,8 @@
         }
     </style>
 
+    <script src="Function_list.js"></script>
+
 </head>
 <body>
 
@@ -111,7 +113,14 @@ function createPopOutMenu() {
         }
     }
 }
-createPopOutMenu();
+</script>
+
+<script>
+    welcomeWidgetOptions = {
+        text: "<u>Welcome to SPARROW.Net</u><br><br>This is your Dashboard"
+    };
+    createWelcomeWidget(welcomeWidgetOptions);
+    createPopOutMenu();
 </script>
 
 <h2> SPARROW_NET-V:0.1 </h2>
