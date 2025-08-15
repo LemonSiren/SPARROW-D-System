@@ -25,8 +25,8 @@ function createWelcomeWidget(options = {}) {
     if (!document.getElementById('welcomeWidget')) {
         const widgetHTML = `
             <div id="welcomeWidget" style="
-                background: rgba(83, 170, 7, 0.85);
-                color: rgba(247, 235, 7, 1);
+                background: linear-gradient(135deg, rgba(46,204,64,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(255,230,0,0.7) 100%);
+                color: #222;
                 font-family: Arial, sans-serif;
                 font-size: 1.5em;
                 padding: 70px 40px;
