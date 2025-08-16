@@ -1,83 +1,1100 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reusable Pop-out Menu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARROW-DS - Live Data Detailed</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        .sidemenu {
-            height: 100%;
-            width: 0;
-            position: fixed;
-            z-index: 1;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+
+        .notification-icon {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .notification-icon:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .notification-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ef4444;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Page Title */
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f9fafb;
+        }
+
+        .page-title i {
+            font-size: 2rem;
+            color: #fbbf24;
+            animation: pulse 2s infinite;
+        }
+
+        /* Data Cards Grid */
+        .data-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .data-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(74, 222, 128, 0.5);
+        }
+
+        .data-card::before {
+            content: '';
+            position: absolute;
             top: 0;
             left: 0;
-            background-color: #222;
-            overflow-x: hidden;
-            transition: 0.3s;
-            padding-top: 60px;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #10b981, #34d399, #fbbf24);
         }
-        .sidemenu a {
-            padding: 8px 8px 8px 32px;
-            text-decoration: none;
-            font-size: 22px;
-            color: #fff;
-            display: block;
-            transition: 0.2s;
+
+        .card-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #4ade80;
         }
-        .sidemenu a:hover {
-            background-color: #575757;
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #d1d5db;
+            margin-bottom: 0.5rem;
         }
-        .sidemenu .closebtn {
-            position: absolute;
-            top: 10px;
-            right: 20px;
-            font-size: 36px;
-            color: #fff;
+
+        .card-status {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #f9fafb;
         }
-        #openMenuBtn {
-            font-size: 20px;
-            cursor: pointer;
-            background: #222;
-            color: #fff;
+
+        .status-healthy { color: #10b981; }
+        .status-warning { color: #f59e0b; }
+        .status-danger { color: #ef4444; }
+        .status-info { color: #3b82f6; }
+
+        /* Detailed Sections */
+        .detail-section {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .section-header i {
+            font-size: 1.5rem;
+            color: #fbbf24;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 3px solid #4ade80;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: #9ca3af;
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        /* Disease Detection */
+        .disease-item {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .disease-info h4 {
+            color: #ef4444;
+            margin-bottom: 0.5rem;
+        }
+
+        .disease-info p {
+            color: #d1d5db;
+            font-size: 0.9rem;
+        }
+
+        .view-image-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
             border: none;
-            padding: 10px 20px;
-            margin: 20px;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .view-image-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Soil Info */
+        .soil-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .soil-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            border-left: 3px solid #10b981;
+        }
+
+        /* Weather Details */
+        .weather-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .weather-item {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+        }
+
+        .weather-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 0.5rem;
+        }
+
+        .weather-label {
+            font-size: 0.875rem;
+            color: #9ca3af;
+        }
+
+        /* Crop Health Issues */
+        .health-issues {
+            list-style: none;
+        }
+
+        .health-issue {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #f59e0b;
+        }
+
+        /* Bird Activity */
+        .bird-activity {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1.5rem;
+        }
+
+        .activity-level {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #4ade80;
+            margin-bottom: 1rem;
+        }
+
+        /* Irrigation Details */
+        .irrigation-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .irrigation-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+            border-left: 3px solid #3b82f6;
+        }
+
+        .irrigation-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #3b82f6;
+            margin-bottom: 0.5rem;
+        }
+
+        .irrigation-patch {
+            color: #d1d5db;
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .data-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .logo i {
+                font-size: 1.5rem;
+            }
+
+            .notification-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .notification-badge {
+                width: 18px;
+                height: 18px;
+                font-size: 0.7rem;
+            }
+
+            .page-title {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .page-title i {
+                font-size: 1.75rem;
+            }
+
+            .section-header h3 {
+                font-size: 1.125rem;
+            }
+
+            .section-header i {
+                font-size: 1.25rem;
+            }
+
+            .data-card {
+                padding: 1.25rem;
+            }
+
+            .card-icon {
+                font-size: 2rem;
+            }
+
+            .card-title {
+                font-size: 0.875rem;
+            }
+
+            .card-status {
+                font-size: 1.125rem;
+            }
+
+            .detail-section {
+                padding: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .detail-item {
+                padding: 0.875rem;
+            }
+
+            .detail-label {
+                font-size: 0.8rem;
+            }
+
+            .detail-value {
+                font-size: 1rem;
+            }
+
+            .disease-item {
+                padding: 1.25rem;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .view-image-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.875rem;
+                align-self: stretch;
+                text-align: center;
+            }
+
+            .soil-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .weather-details {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+
+            .weather-item {
+                padding: 0.875rem;
+            }
+
+            .weather-value {
+                font-size: 1.25rem;
+            }
+
+            .weather-label {
+                font-size: 0.8rem;
+            }
+
+            .health-issue {
+                padding: 0.875rem;
+            }
+
+            .bird-activity {
+                padding: 1.25rem;
+            }
+
+            .activity-level {
+                font-size: 1.125rem;
+            }
+
+            .irrigation-details {
+                grid-template-columns: 1fr;
+            }
+
+            .irrigation-item {
+                padding: 0.875rem;
+            }
+
+            .irrigation-amount {
+                font-size: 1.25rem;
+            }
+
+            .irrigation-patch {
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+
+            .header {
+                padding: 0.75rem;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .logo {
+                justify-content: center;
+                font-size: 1.125rem;
+            }
+
+            .notification-icon {
+                align-self: center;
+                width: 40px;
+                height: 40px;
+            }
+
+            .page-title {
+                padding: 1rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .page-title i {
+                font-size: 1.5rem;
+            }
+
+            .data-grid {
+                gap: 1rem;
+                margin-bottom: 2rem;
+            }
+
+            .data-card {
+                padding: 1rem;
+            }
+
+            .card-icon {
+                font-size: 1.75rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .card-title {
+                font-size: 0.8rem;
+                margin-bottom: 0.375rem;
+            }
+
+            .card-status {
+                font-size: 1rem;
+            }
+
+            .detail-section {
+                padding: 1.25rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .section-header {
+                margin-bottom: 1.25rem;
+                padding-bottom: 0.75rem;
+            }
+
+            .section-header h3 {
+                font-size: 1rem;
+            }
+
+            .detail-item {
+                padding: 0.75rem;
+            }
+
+            .detail-label {
+                font-size: 0.75rem;
+            }
+
+            .detail-value {
+                font-size: 0.875rem;
+            }
+
+            .disease-item {
+                padding: 1rem;
+                gap: 0.75rem;
+            }
+
+            .disease-info h4 {
+                font-size: 1rem;
+                margin-bottom: 0.375rem;
+            }
+
+            .disease-info p {
+                font-size: 0.8rem;
+            }
+
+            .view-image-btn {
+                padding: 0.75rem 1rem;
+                font-size: 0.8rem;
+            }
+
+            .soil-grid {
+                gap: 0.75rem;
+            }
+
+            .soil-item {
+                padding: 0.875rem;
+            }
+
+            .weather-details {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+
+            .weather-item {
+                padding: 0.75rem;
+            }
+
+            .weather-value {
+                font-size: 1.125rem;
+                margin-bottom: 0.375rem;
+            }
+
+            .weather-label {
+                font-size: 0.75rem;
+            }
+
+            .health-issues {
+                margin-top: 0.75rem;
+            }
+
+            .health-issue {
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .bird-activity {
+                padding: 1rem;
+            }
+
+            .activity-level {
+                font-size: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .irrigation-details {
+                gap: 0.75rem;
+            }
+
+            .irrigation-item {
+                padding: 0.75rem;
+            }
+
+            .irrigation-amount {
+                font-size: 1.125rem;
+                margin-bottom: 0.375rem;
+            }
+
+            .irrigation-patch {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .data-card:hover {
+                transform: none;
+            }
+
+            .detail-item:hover {
+                transform: none;
+            }
+
+            .disease-item:hover {
+                transform: none;
+            }
+
+            .soil-item:hover {
+                transform: none;
+            }
+
+            .weather-item:hover {
+                transform: none;
+            }
+
+            .health-issue:hover {
+                transform: none;
+            }
+
+            .irrigation-item:hover {
+                transform: none;
+            }
+
+            .data-card:active {
+                transform: scale(0.98);
+            }
+
+            .detail-item:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .disease-item:active {
+                background: rgba(239, 68, 68, 0.15);
+            }
+
+            .soil-item:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .weather-item:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .health-issue:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            .irrigation-item:active {
+                background: rgba(255, 255, 255, 0.15);
+            }
+
+            /* Larger touch targets */
+            .view-image-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .notification-icon {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                flex-direction: row;
+                gap: 0;
+            }
+
+            .data-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
+            }
+
+            .weather-details {
+                grid-template-columns: repeat(3, 1fr);
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                padding: 1.5rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .main-content {
+                padding: 0.5rem;
+            }
+
+            .page-title {
+                padding: 0.75rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.25rem;
+            }
+
+            .page-title i {
+                font-size: 1.25rem;
+            }
+
+            .data-card {
+                padding: 0.875rem;
+            }
+
+            .card-icon {
+                font-size: 1.5rem;
+            }
+
+            .card-title {
+                font-size: 0.75rem;
+            }
+
+            .card-status {
+                font-size: 0.875rem;
+            }
+
+            .detail-section {
+                padding: 1rem;
+            }
+
+            .section-header h3 {
+                font-size: 0.875rem;
+            }
+
+            .detail-item {
+                padding: 0.625rem;
+            }
+
+            .detail-label {
+                font-size: 0.7rem;
+            }
+
+            .detail-value {
+                font-size: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
+    <!-- Header -->
+    <header class="header">
+        <button id="openMenuBtn" onclick="openMenu()">
+            <i class="fas fa-bars"></i>
+        </button>
+        <div class="logo">
+            <i class="fas fa-leaf"></i>
+            SPARROW-DS
+        </div>
+        <div class="notification-icon">
+            <i class="fas fa-bell"></i>
+            <div class="notification-badge">3</div>
+        </div>
+    </header>
 
-<script>
-function createPopOutMenu() {
-    // Only add if not already present
-    if (!document.getElementById('mySidemenu')) {
-        // Create menu HTML
-        const menuHTML = `
-            <button id="openMenuBtn" onclick="openMenu()">☰ Open Menu</button>
-            <div id="mySidemenu" class="sidemenu">
-                <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">&times;</a>
-                <a href="#">Home</a>
-                <a href="#">About</a>
-                <a href="#">Services</a>
-                <a href="#">Contact</a>
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Title -->
+        <div class="page-title fade-in-up">
+            <i class="fas fa-satellite-dish"></i>
+            <h1>LIVE DATA</h1>
+        </div>
+
+        <!-- Data Cards -->
+        <div class="data-grid fade-in-up">
+            <div class="data-card">
+                <div class="card-icon">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div class="card-title">CROP HEALTH</div>
+                <div class="card-status status-danger">UNHEALTHY</div>
             </div>
-        `;
-        // Insert into body
-        document.body.insertAdjacentHTML('afterbegin', menuHTML);
+            
+            <div class="data-card">
+                <div class="card-icon">
+                    <i class="fas fa-tint"></i>
+                </div>
+                <div class="card-title">SOIL MOISTURE</div>
+                <div class="card-status status-info">MOIST</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="card-icon">
+                    <i class="fas fa-dove"></i>
+                </div>
+                <div class="card-title">BIRD ACTIVITY</div>
+                <div class="card-status status-warning">LOW</div>
+            </div>
+            
+            <div class="data-card">
+                <div class="card-icon">
+                    <i class="fas fa-cloud-rain"></i>
+                </div>
+                <div class="card-title">WEATHER</div>
+                <div class="card-status status-info">RAINY</div>
+            </div>
+        </div>
 
-        // Add menu functions to window so HTML onclick works
-        window.openMenu = function() {
-            document.getElementById("mySidemenu").style.width = "250px";
-        }
-        window.closeMenu = function() {
-            document.getElementById("mySidemenu").style.width = "0";
-        }
-    }
-}
+        <!-- Detected Diseases -->
+        <div class="detail-section fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-exclamation-triangle"></i>
+                <h3>DETECTED DISEASES</h3>
+            </div>
+            
+            <div class="disease-item">
+                <div class="disease-info">
+                    <h4>PATCH 1 (YELLOWING)</h4>
+                    <p>Early stage disease detected</p>
+                </div>
+                <button class="view-image-btn">VIEW IMAGE</button>
+            </div>
+            
+            <div class="disease-item">
+                <div class="disease-info">
+                    <h4>PATCH 3 (WATERLOGGED)</h4>
+                    <p>Excessive moisture detected</p>
+                </div>
+                <button class="view-image-btn">VIEW IMAGE</button>
+            </div>
+        </div>
 
-// Example usage: call this function from another script
-createPopOutMenu();
+        <!-- Soil Information -->
+        <div class="detail-section fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-layer-group"></i>
+                <h3>SOIL INFO</h3>
+            </div>
+            
+            <div class="soil-grid">
+                <div class="soil-item">
+                    <div class="detail-label">MOISTURE</div>
+                    <div class="detail-value">50%</div>
+                </div>
+                
+                <div class="soil-item">
+                    <div class="detail-label">IRRIGATION RECEIVED PATCH 1</div>
+                    <div class="detail-value">200 ML</div>
+                </div>
+                
+                <div class="soil-item">
+                    <div class="detail-label">IRRIGATION RECEIVED PATCH 2</div>
+                    <div class="detail-value">500 ML</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Weather Details -->
+        <div class="detail-section fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-cloud-sun"></i>
+                <h3>WEATHER</h3>
+            </div>
+            
+            <div class="weather-details">
+                <div class="weather-item">
+                    <div class="weather-value">CLOUDY</div>
+                    <div class="weather-label">Condition</div>
+                </div>
+                
+                <div class="weather-item">
+                    <div class="weather-value">37°C</div>
+                    <div class="weather-label">Temperature</div>
+                </div>
+                
+                <div class="weather-item">
+                    <div class="weather-value">90%</div>
+                    <div class="weather-label">Humidity</div>
+                </div>
+                
+                <div class="weather-item">
+                    <div class="weather-value">3%</div>
+                    <div class="weather-label">Precipitation</div>
+                </div>
+                
+                <div class="weather-item">
+                    <div class="weather-value">4</div>
+                    <div class="weather-label">UV Index</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Crop Health -->
+        <div class="detail-section fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-seedling"></i>
+                <h3>CROP HEALTH</h3>
+            </div>
+            
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <div class="detail-label">OVERALL STATUS</div>
+                    <div class="detail-value status-healthy">HEALTHY</div>
+                </div>
+            </div>
+            
+            <div class="section-header" style="margin-top: 1.5rem;">
+                <i class="fas fa-exclamation-circle"></i>
+                <h3>ISSUES</h3>
+            </div>
+            
+            <ul class="health-issues">
+                <li class="health-issue">WATERLOGGED PATCH 3</li>
+                <li class="health-issue">YELLOWING IN PATCH 4</li>
+            </ul>
+        </div>
+
+        <!-- Bird Activity -->
+        <div class="detail-section fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-dove"></i>
+                <h3>BIRD ACTIVITY</h3>
+            </div>
+            
+            <div class="bird-activity">
+                <div class="activity-level">ACTIVITY = LOW</div>
+                <div class="detail-label">SPECIES IDENTIFIED</div>
+                <div class="detail-value">Common Sparrow, House Finch</div>
+            </div>
+        </div>
+
+        <!-- Irrigation Details -->
+        <div class="detail-section fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-tint"></i>
+                <h3>IRRIGATION DETAILS</h3>
+            </div>
+            
+            <div class="irrigation-details">
+                <div class="irrigation-item">
+                    <div class="irrigation-amount">200 ML</div>
+                    <div class="irrigation-patch">PATCH 1</div>
+                </div>
+                
+                <div class="irrigation-item">
+                    <div class="irrigation-amount">500 ML</div>
+                    <div class="irrigation-patch">PATCH 2</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for animation
+        document.querySelectorAll('.fade-in-up').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'all 0.6s ease-out';
+            observer.observe(section);
+        });
+
+        // Menu functionality (placeholder)
+        function openMenu() {
+            alert('Menu functionality will be implemented here');
+        }
+
+        // View image functionality
+        document.querySelectorAll('.view-image-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                alert('Image viewer will be implemented here');
+            });
+        });
 </script>
-
 </body>
 </html>

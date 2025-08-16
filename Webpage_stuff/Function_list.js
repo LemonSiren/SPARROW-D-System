@@ -1,136 +1,461 @@
-function createPopOutMenu(options = {}) {
-    if (!document.getElementById('mySidemenu')) {
-        const menuHTML = `
-            <button id="openMenuBtn" onclick="openMenu()">☰ Open Menu</button>
-            <div id="mySidemenu" class="sidemenu">
-                <a href="javascript:void(0)" class="closebtn" onclick="closeMenu()">&times;</a>
-                <a href="#">${options.homeText || "Home"}</a>
-                <a href="#">${options.reportText || "Monthly Report"}</a>
-                <a href="${options.servicesHref || "Services(SPARROW).html"}">${options.servicesText || "Services"}</a>
-                <a href="#">${options.contactText || "Contact"}</a>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('afterbegin', menuHTML);
-        window.openMenu = function() {
-            document.getElementById("mySidemenu").style.width = "250px";
+// SPARROW-DS System Utility Functions
+// Modern, refined functions for the agricultural monitoring dashboard
+
+/**
+ * Real-time data update utilities
+ */
+class SparrowDataManager {
+    constructor() {
+        this.updateInterval = 30000; // 30 seconds
+        this.isRunning = false;
+        this.dataCache = new Map();
+    }
+
+    /**
+     * Start real-time data updates
+     */
+    startRealTimeUpdates() {
+        if (this.isRunning) return;
+        
+        this.isRunning = true;
+        this.updateData();
+        
+        setInterval(() => {
+            this.updateData();
+        }, this.updateInterval);
+    }
+
+    /**
+     * Stop real-time data updates
+     */
+    stopRealTimeUpdates() {
+        this.isRunning = false;
+    }
+
+    /**
+     * Update dashboard data
+     */
+    updateData() {
+        // Simulate real-time data updates
+        this.updateCropHealth();
+        this.updateSoilMoisture();
+        this.updateBirdActivity();
+        this.updateWeather();
+        this.updateNotifications();
+    }
+
+    /**
+     * Update crop health data
+     */
+    updateCropHealth() {
+        const cropHealthElement = document.querySelector('.data-card .card-status');
+        if (cropHealthElement && cropHealthElement.textContent.includes('CROP HEALTH')) {
+            const statuses = ['HEALTHY', 'UNHEALTHY', 'WARNING'];
+            const randomStatus = statuses[Math.floor(Math.random() * statuses.length)];
+            cropHealthElement.textContent = randomStatus;
+            
+            // Update status class
+            cropHealthElement.className = 'card-status';
+            if (randomStatus === 'HEALTHY') {
+                cropHealthElement.classList.add('status-healthy');
+            } else if (randomStatus === 'WARNING') {
+                cropHealthElement.classList.add('status-warning');
+            } else {
+                cropHealthElement.classList.add('status-danger');
+            }
         }
-        window.closeMenu = function() {
-            document.getElementById("mySidemenu").style.width = "0";
+    }
+
+    /**
+     * Update soil moisture data
+     */
+    updateSoilMoisture() {
+        const soilElement = document.querySelector('.data-card .card-status');
+        if (soilElement && soilElement.textContent.includes('SOIL MOISTURE')) {
+            const moistureLevels = ['DRY', 'MOIST', 'WET'];
+            const randomLevel = moistureLevels[Math.floor(Math.random() * moistureLevels.length)];
+            soilElement.textContent = randomLevel;
+        }
+    }
+
+    /**
+     * Update bird activity data
+     */
+    updateBirdActivity() {
+        const birdElement = document.querySelector('.data-card .card-status');
+        if (birdElement && birdElement.textContent.includes('BIRD ACTIVITY')) {
+            const activityLevels = ['LOW', 'MEDIUM', 'HIGH'];
+            const randomLevel = activityLevels[Math.floor(Math.random() * activityLevels.length)];
+            birdElement.textContent = randomLevel + ' ✓';
+        }
+    }
+
+    /**
+     * Update weather data
+     */
+    updateWeather() {
+        const weatherElement = document.querySelector('.data-card .card-status');
+        if (weatherElement && weatherElement.textContent.includes('WEATHER')) {
+            const weatherConditions = ['SUNNY', 'CLOUDY', 'RAINY', 'PARTLY CLOUDY'];
+            const randomCondition = weatherConditions[Math.floor(Math.random() * weatherConditions.length)];
+            weatherElement.textContent = randomCondition;
+        }
+    }
+
+    /**
+     * Update notification badge
+     */
+    updateNotifications() {
+        const notificationBadge = document.querySelector('.notification-badge');
+        if (notificationBadge) {
+            const currentCount = parseInt(notificationBadge.textContent) || 0;
+            const newCount = Math.max(0, currentCount + (Math.random() > 0.7 ? 1 : 0));
+            notificationBadge.textContent = newCount;
+            
+            if (newCount > 0) {
+                notificationBadge.style.animation = 'pulse 1s infinite';
+            } else {
+                notificationBadge.style.animation = 'none';
+            }
         }
     }
 }
 
-
-function createWelcomeWidget(options = {}) {
-    if (!document.getElementById('welcomeWidget')) {
-        const widgetHTML = `
-            <div id="welcomeWidget" style="
-                background: linear-gradient(135deg, rgba(46,204,64,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(255,230,0,0.7) 100%);
-                color: #222;
-                font-family: Arial, sans-serif;
-                font-size: 1.5em;
-                padding: 70px 40px;
-                border-radius: 12px;
-                box-shadow: 0 4px 16px rgba(255, 255, 255, 1);
-                max-width: 400px;
-                margin: 40px auto;
-                text-align: center;
-                position: absolute;   
-                top: -80px; 
-                right: 500px;
-                left: 500px;
-            ">
-                ${options.text || "Welcome to your dashboard"}
+/**
+ * Chart and visualization utilities
+ */
+class SparrowCharts {
+    /**
+     * Create a simple progress bar
+     */
+    static createProgressBar(container, value, max, label) {
+        const progressHTML = `
+            <div class="progress-container">
+                <div class="progress-label">${label}</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${(value / max) * 100}%"></div>
+                </div>
+                <div class="progress-value">${value}/${max}</div>
             </div>
         `;
-        document.body.insertAdjacentHTML('afterbegin', widgetHTML);
+        
+        if (typeof container === 'string') {
+            document.getElementById(container).innerHTML = progressHTML;
+        } else {
+            container.innerHTML = progressHTML;
+        }
+    }
+
+    /**
+     * Create a gauge chart
+     */
+    static createGauge(container, value, max, label, color = '#4ade80') {
+        const percentage = (value / max) * 100;
+        const angle = (percentage / 100) * 180;
+        
+        const gaugeHTML = `
+            <div class="gauge-container">
+                <div class="gauge-label">${label}</div>
+                <div class="gauge">
+                    <div class="gauge-fill" style="transform: rotate(${angle}deg); background: ${color}"></div>
+                </div>
+                <div class="gauge-value">${value}%</div>
+            </div>
+        `;
+        
+        if (typeof container === 'string') {
+            document.getElementById(container).innerHTML = gaugeHTML;
+        } else {
+            container.innerHTML = gaugeHTML;
+        }
     }
 }
 
-/*Unuseable as of now */
-function createLiveDataWidget(options = {}) {
-    if (!document.getElementById('liveDataWidget')) {
-        const widgetHTML = `
-            <div id="liveDataWidget" style="
-                background: rgba(0, 0, 0, 0.85);
-                color: white;
-                font-family: Arial, sans-serif;
-                font-size: 1.2em;
-                padding: 40px 30px;
-                border-radius: 12px;
-                box-shadow: 0 4px 16px rgba(0,0,0,0.3);
-                max-width: 400px;
-                margin: 20px auto;
-                text-align: center;
-            ">
-                <div id="liveDataTitle">${options.title || "Live Data"}</div>
-                <div id="liveDataContent">Loading...</div>
+/**
+ * Notification system
+ */
+class SparrowNotifications {
+    constructor() {
+        this.notifications = [];
+        this.container = null;
+    }
+
+    /**
+     * Initialize notification container
+     */
+    init(containerId = 'notification-container') {
+        if (!document.getElementById(containerId)) {
+            const container = document.createElement('div');
+            container.id = containerId;
+            container.className = 'notification-container';
+            document.body.appendChild(container);
+        }
+        this.container = document.getElementById(containerId);
+    }
+
+    /**
+     * Show a notification
+     */
+    show(message, type = 'info', duration = 5000) {
+        const notification = {
+            id: Date.now(),
+            message,
+            type,
+            duration
+        };
+
+        this.notifications.push(notification);
+        this.render(notification);
+        
+        setTimeout(() => {
+            this.remove(notification.id);
+        }, duration);
+    }
+
+    /**
+     * Render a notification
+     */
+    render(notification) {
+        const notificationElement = document.createElement('div');
+        notificationElement.className = `notification notification-${notification.type}`;
+        notificationElement.setAttribute('data-id', notification.id);
+        notificationElement.innerHTML = `
+            <div class="notification-content">
+                <span class="notification-message">${notification.message}</span>
+                <button class="notification-close" onclick="this.closest('.notification').remove()">&times;</button>
             </div>
         `;
-        document.body.insertAdjacentHTML('afterbegin', widgetHTML);
+        
+        this.container.appendChild(notificationElement);
+        
+        // Add animation
+        setTimeout(() => {
+            notificationElement.classList.add('show');
+        }, 100);
+    }
 
-        // Fetch data from API
-        fetch(options.apiUrl)
-            .then(response => response.json())
-            .then(data => {
-                // You can customize how data is displayed
-                document.getElementById('liveDataContent').innerText =
-                    options.formatData ? options.formatData(data) : JSON.stringify(data, null, 2);
-            })
-            .catch(error => {
-                document.getElementById('liveDataContent').innerText = "Error loading data.";
+    /**
+     * Remove a notification
+     */
+    remove(id) {
+        const notification = this.notifications.find(n => n.id === id);
+        if (notification) {
+            const element = this.container.querySelector(`[data-id="${id}"]`);
+            if (element) {
+                element.classList.remove('show');
+                element.style.transform = 'translateX(100%)';
+                element.style.opacity = '0';
+                setTimeout(() => {
+                    element.remove();
+                }, 300);
+            }
+            this.notifications = this.notifications.filter(n => n.id !== id);
+        }
+    }
+
+    /**
+     * Remove notification by element
+     */
+    removeElement(element) {
+        if (element && element.classList.contains('notification')) {
+            element.classList.remove('show');
+            element.style.transform = 'translateX(100%)';
+            element.style.opacity = '0';
+            setTimeout(() => {
+                element.remove();
+            }, 300);
+        }
+    }
+
+    /**
+     * Clear all notifications
+     */
+    clear() {
+        this.notifications = [];
+        this.container.innerHTML = '';
+    }
+}
+
+/**
+ * Data export utilities
+ */
+class SparrowDataExport {
+    /**
+     * Export data as CSV
+     */
+    static exportToCSV(data, filename = 'sparrow-data.csv') {
+        const csvContent = this.convertToCSV(data);
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    /**
+     * Convert data to CSV format
+     */
+    static convertToCSV(data) {
+        if (!Array.isArray(data) || data.length === 0) return '';
+        
+        const headers = Object.keys(data[0]);
+        const csvRows = [headers.join(',')];
+        
+        for (const row of data) {
+            const values = headers.map(header => {
+                const value = row[header];
+                return typeof value === 'string' ? `"${value}"` : value;
             });
+            csvRows.push(values.join(','));
+        }
+        
+        return csvRows.join('\n');
+    }
+
+    /**
+     * Export data as JSON
+     */
+    static exportToJSON(data, filename = 'sparrow-data.json') {
+        const jsonContent = JSON.stringify(data, null, 2);
+        const blob = new Blob([jsonContent], { type: 'application/json' });
+        const link = document.createElement('a');
+        
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', filename);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
     }
 }
 
-function createVerticalSubMenu(options = {}) {
-    if (!document.getElementById('verticalSubMenu')) {
-        const submenuHTML = `
-            <button id="openSubMenuBtn" onclick="openSubMenu()" style="
-                position: fixed;
-                top: 80px;
-                left: 0;
-                z-index: 2;
-                font-size: 18px;
-                background:linear-gradient(135deg, rgba(46,204,64,0.7) 0%, rgba(255,255,255,0.7) 50%, rgba(255,230,0,0.7) 100%);
-                color: #000000ff;
-                border: none;
-                padding: 10px 20px;
-                border-radius: 0 8px 8px 0;
-                cursor: pointer;
-            ">☰ [Placeholder]</button>
-            <div id="verticalSubMenu" style="
-                height: 100%;
-                width: 0;
-                position: fixed;
-                z-index: 2;
-                top: 0;
-                left: 0;
-                background: linear-gradient(180deg, rgba(46,204,64,0.7) 0%, rgba(255,255,255,0.7) 80%, rgba(255,230,0,0.7) 100%);
-                overflow-x: hidden;
-                transition: 0.3s;
-                padding-top: 100px;
-                box-shadow: 2px 0 8px rgba(0,0,0,0.2);
-            ">
-                <a href="javascript:void(0)" style="
-                    position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    font-size: 36px;
-                    color: #222;
-                    text-decoration: none;
-                " onclick="closeSubMenu()">&times;</a>
-                <a href="#" style="display:block;padding:16px 32px;color:#222;font-size:20px;text-decoration:none;">${options.item1 || "Subitem 1"}</a>
-                <a href="#" style="display:block;padding:16px 32px;color:#222;font-size:20px;text-decoration:none;">${options.item2 || "Subitem 2"}</a>
-                <a href="#" style="display:block;padding:16px 32px;color:#222;font-size:20px;text-decoration:none;">${options.item3 || "Subitem 3"}</a>
-            </div>
-        `;
-        document.body.insertAdjacentHTML('afterbegin', submenuHTML);
-        window.openSubMenu = function() {
-            document.getElementById("verticalSubMenu").style.width = "220px";
+/**
+ * Theme management
+ */
+class SparrowThemeManager {
+    constructor() {
+        this.currentTheme = 'dark';
+        this.themes = {
+            dark: {
+                primary: '#4ade80',
+                secondary: '#fbbf24',
+                background: 'linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%)',
+                surface: 'rgba(255, 255, 255, 0.1)',
+                text: '#ffffff'
+            },
+            light: {
+                primary: '#059669',
+                secondary: '#d97706',
+                background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 50%, #cbd5e1 100%)',
+                surface: 'rgba(0, 0, 0, 0.05)',
+                text: '#1e293b'
+            }
+        };
+    }
+
+    /**
+     * Toggle between themes
+     */
+    toggleTheme() {
+        this.currentTheme = this.currentTheme === 'dark' ? 'light' : 'dark';
+        this.applyTheme();
+        localStorage.setItem('sparrow-theme', this.currentTheme);
+    }
+
+    /**
+     * Apply current theme
+     */
+    applyTheme() {
+        const theme = this.themes[this.currentTheme];
+        const root = document.documentElement;
+        
+        root.style.setProperty('--primary-color', theme.primary);
+        root.style.setProperty('--secondary-color', theme.secondary);
+        root.style.setProperty('--background', theme.background);
+        root.style.setProperty('--surface-color', theme.surface);
+        root.style.setProperty('--text-color', theme.text);
+        
+        // Update body background
+        document.body.style.background = theme.background;
+        document.body.style.color = theme.text;
+    }
+
+    /**
+     * Initialize theme from localStorage
+     */
+    init() {
+        const savedTheme = localStorage.getItem('sparrow-theme');
+        if (savedTheme && this.themes[savedTheme]) {
+            this.currentTheme = savedTheme;
         }
-        window.closeSubMenu = function() {
-            document.getElementById("verticalSubMenu").style.width = "0";
-        }
+        this.applyTheme();
     }
 }
+
+/**
+ * Initialize all SPARROW-DS components
+ */
+function initializeSparrowSystem() {
+    // Initialize theme manager
+    const themeManager = new SparrowThemeManager();
+    themeManager.init();
+    
+    // Initialize data manager
+    const dataManager = new SparrowDataManager();
+    
+    // Initialize notifications
+    const notifications = new SparrowNotifications();
+    notifications.init();
+    
+    // Start real-time updates after a delay
+    setTimeout(() => {
+        dataManager.startRealTimeUpdates();
+    }, 2000);
+    
+    // Add theme toggle button to header if it exists
+    const header = document.querySelector('.header');
+    if (header) {
+        const themeToggle = document.createElement('button');
+        themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+        themeToggle.className = 'theme-toggle';
+        themeToggle.onclick = () => themeManager.toggleTheme();
+        header.appendChild(themeToggle);
+    }
+    
+    // Show welcome notification
+    notifications.show('SPARROW-DS System initialized successfully!', 'success', 3000);
+    
+    return {
+        themeManager,
+        dataManager,
+        notifications
+    };
+}
+
+// Global instances
+let sparrowSystem = null;
+let sparrowNotifications = null;
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    sparrowSystem = initializeSparrowSystem();
+    sparrowNotifications = sparrowSystem.notifications;
+});
+
+// Export for global use
+window.SparrowSystem = {
+    initialize: initializeSparrowSystem,
+    charts: SparrowCharts,
+    export: SparrowDataExport,
+    notifications: SparrowNotifications
+};

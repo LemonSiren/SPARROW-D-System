@@ -1,10 +1,888 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <title>Services</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SPARROW-DS - Farm Data Log</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #4ade80;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+
+        .back-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #f9fafb;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Content */
+        .main-content {
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Page Title */
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .page-title h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #f9fafb;
+        }
+
+        .page-title i {
+            font-size: 2rem;
+            color: #fbbf24;
+        }
+
+        /* Current Time Display */
+        .current-time {
+            background: linear-gradient(135deg, #10b981, #34d399);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(16, 185, 129, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .current-time::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="75" cy="75" r="1" fill="rgba(255,255,255,0.1)"/><circle cx="50" cy="10" r="0.5" fill="rgba(255,255,255,0.1)"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+            opacity: 0.3;
+        }
+
+        .current-time h2 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .current-time p {
+            font-size: 1.25rem;
+            color: #374151;
+            font-weight: 500;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Historical Data Log */
+        .historical-log {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 3rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .section-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .section-header i {
+            font-size: 1.5rem;
+            color: #fbbf24;
+        }
+
+        .log-entries {
+            list-style: none;
+        }
+
+        .log-entry {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #4ade80;
+            position: relative;
+        }
+
+        .log-entry:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+            border-left-color: #10b981;
+        }
+
+        .log-entry::before {
+            content: '•';
+            position: absolute;
+            left: -10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #4ade80;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .log-date {
+            font-weight: 700;
+            color: #4ade80;
+            margin-bottom: 0.5rem;
+            font-size: 1.125rem;
+        }
+
+        .log-details {
+            color: #d1d5db;
+            font-size: 0.9rem;
+        }
+
+        .log-entry.today {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(52, 211, 153, 0.2));
+            border-left-color: #10b981;
+        }
+
+        .log-entry.today::before {
+            color: #10b981;
+        }
+
+        .log-entry.today .log-date {
+            color: #10b981;
+        }
+
+        /* AI Suggestions */
+        .ai-suggestions {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(168, 85, 247, 0.1));
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid rgba(139, 92, 246, 0.3);
+        }
+
+        .ai-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .ai-header i {
+            font-size: 1.5rem;
+            color: #fbbf24;
+        }
+
+        .ai-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #f9fafb;
+        }
+
+        .suggestion-list {
+            list-style: none;
+        }
+
+        .suggestion-item {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            border-left: 3px solid #8b5cf6;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .suggestion-item:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateX(5px);
+        }
+
+        .suggestion-item::before {
+            content: '-';
+            position: absolute;
+            left: 0.5rem;
+            color: #8b5cf6;
+            font-weight: bold;
+        }
+
+        .suggestion-text {
+            margin-left: 1.5rem;
+            color: #f9fafb;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .current-time h2 {
+                font-size: 2rem;
+            }
+            
+            .header {
+                padding: 1rem;
+            }
+
+            .logo {
+                font-size: 1.25rem;
+            }
+
+            .logo i {
+                font-size: 1.5rem;
+            }
+
+            .back-btn {
+                padding: 0.75rem 1.25rem;
+                font-size: 0.875rem;
+            }
+
+            .page-title {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .page-title i {
+                font-size: 1.75rem;
+            }
+
+            .current-time {
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .current-time h2 {
+                font-size: 2rem;
+            }
+
+            .current-time p {
+                font-size: 1.125rem;
+            }
+
+            .historical-log {
+                padding: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .section-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .section-header i {
+                font-size: 1.25rem;
+            }
+
+            .log-entry {
+                padding: 1.25rem;
+            }
+
+            .log-date {
+                font-size: 1rem;
+            }
+
+            .log-details {
+                font-size: 0.8rem;
+            }
+
+            .ai-suggestions {
+                padding: 1.5rem;
+            }
+
+            .ai-header h3 {
+                font-size: 1.25rem;
+            }
+
+            .ai-header i {
+                font-size: 1.25rem;
+            }
+
+            .suggestion-item {
+                padding: 0.875rem;
+            }
+
+            .suggestion-text {
+                font-size: 0.875rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 0.75rem;
+            }
+
+            .header {
+                padding: 0.75rem;
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch;
+            }
+
+            .logo {
+                justify-content: center;
+                font-size: 1.125rem;
+            }
+
+            .back-btn {
+                align-self: center;
+                width: fit-content;
+                padding: 0.75rem 1.5rem;
+            }
+
+            .page-title {
+                padding: 1rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.5rem;
+            }
+
+            .page-title i {
+                font-size: 1.5rem;
+            }
+
+            .current-time {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .current-time h2 {
+                font-size: 1.75rem;
+            }
+
+            .current-time p {
+                font-size: 1rem;
+            }
+
+            .historical-log {
+                padding: 1.25rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .section-header {
+                margin-bottom: 1.25rem;
+                padding-bottom: 0.75rem;
+            }
+
+            .section-header h3 {
+                font-size: 1.125rem;
+            }
+
+            .section-header i {
+                font-size: 1.125rem;
+            }
+
+            .log-entries {
+                margin-top: 1rem;
+            }
+
+            .log-entry {
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+            }
+
+            .log-date {
+                font-size: 0.875rem;
+                margin-bottom: 0.375rem;
+            }
+
+            .log-details {
+                font-size: 0.75rem;
+            }
+
+            .ai-suggestions {
+                padding: 1.25rem;
+            }
+
+            .ai-header {
+                margin-bottom: 1.25rem;
+            }
+
+            .ai-header h3 {
+                font-size: 1.125rem;
+            }
+
+            .ai-header i {
+                font-size: 1.125rem;
+            }
+
+            .suggestion-list {
+                margin-top: 1rem;
+            }
+
+            .suggestion-item {
+                padding: 0.75rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .suggestion-text {
+                font-size: 0.8rem;
+            }
+
+            /* Mobile-specific log entry styling */
+            .log-entry::before {
+                left: -8px;
+                font-size: 1.5rem;
+            }
+
+            .log-entry.today {
+                border-left-width: 3px;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .log-entry:hover {
+                transform: none;
+            }
+
+            .suggestion-item:hover {
+                transform: none;
+            }
+
+            .log-entry:active {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(0.98);
+            }
+
+            .suggestion-item:active {
+                background: rgba(255, 255, 255, 0.2);
+                transform: scale(0.98);
+            }
+
+            /* Larger touch targets */
+            .back-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+
+            .log-entry {
+                min-height: 48px;
+            }
+
+            .suggestion-item {
+                min-height: 44px;
+            }
+        }
+
+        /* Landscape mobile optimization */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .header {
+                flex-direction: row;
+                gap: 0;
+            }
+
+            .current-time {
+                padding: 1.5rem 2rem;
+            }
+
+            .current-time h2 {
+                font-size: 1.75rem;
+            }
+
+            .main-content {
+                padding: 1.5rem;
+            }
+
+            .page-title {
+                padding: 1.5rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.75rem;
+            }
+
+            .historical-log,
+            .ai-suggestions {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Extra small devices */
+        @media (max-width: 360px) {
+            .main-content {
+                padding: 0.5rem;
+            }
+
+            .page-title {
+                padding: 0.75rem;
+            }
+
+            .page-title h1 {
+                font-size: 1.25rem;
+            }
+
+            .page-title i {
+                font-size: 1.25rem;
+            }
+
+            .current-time {
+                padding: 1rem;
+            }
+
+            .current-time h2 {
+                font-size: 1.5rem;
+            }
+
+            .current-time p {
+                font-size: 0.875rem;
+            }
+
+            .historical-log,
+            .ai-suggestions {
+                padding: 1rem;
+            }
+
+            .section-header h3 {
+                font-size: 1rem;
+            }
+
+            .section-header i {
+                font-size: 1rem;
+            }
+
+            .log-entry {
+                padding: 0.875rem;
+            }
+
+            .log-date {
+                font-size: 0.8rem;
+            }
+
+            .log-details {
+                font-size: 0.7rem;
+            }
+
+            .suggestion-item {
+                padding: 0.625rem;
+            }
+
+            .suggestion-text {
+                font-size: 0.75rem;
+            }
+
+            .back-btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.8rem;
+            }
+        }
+
+        /* High DPI displays */
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            .log-entry::before {
+                font-weight: 300;
+            }
+
+            .suggestion-item::before {
+                font-weight: 300;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .header,
+            .back-btn {
+                display: none;
+            }
+
+            .current-time {
+                background: white !important;
+                color: black !important;
+                border: 2px solid #ccc;
+            }
+
+            .historical-log,
+            .ai-suggestions {
+                background: white !important;
+                color: black !important;
+                border: 1px solid #ccc;
+            }
+
+            .log-entry {
+                border-left: 2px solid #333;
+                background: white !important;
+                color: black !important;
+            }
+
+            .suggestion-item {
+                border-left: 2px solid #333;
+                background: white !important;
+                color: black !important;
+            }
+        }
+    </style>
 </head>
 <body>
-    [PLACEHOLDER]
+    <!-- Header -->
+    <header class="header">
+        <a href="SPARROW_NET(MAIN_PAGE).html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+        <div class="logo">
+            <i class="fas fa-chart-line"></i>
+            SPARROW-DS
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Page Title -->
+        <div class="page-title fade-in-up">
+            <i class="fas fa-chart-line"></i>
+            <h1>FARM DATA LOG</h1>
+        </div>
+
+        <!-- Current Time -->
+        <div class="current-time fade-in-up">
+            <h2 id="currentTime">11 AM</h2>
+            <p id="timeAgo">3 HOURS AGO</p>
+        </div>
+
+        <!-- Historical Data Log -->
+        <div class="historical-log fade-in-up">
+            <div class="section-header">
+                <i class="fas fa-history"></i>
+                <h3>HISTORICAL DATA LOG</h3>
+            </div>
+            
+            <ul class="log-entries">
+                <li class="log-entry today" onclick="showTodayDetails()">
+                    <div class="log-date">TODAY (15/08/2025)</div>
+                    <div class="log-details">Click & open Sub Menu</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">YESTERDAY (14/08/2025)</div>
+                    <div class="log-details">Irrigation completed for all patches</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">13/08/2025</div>
+                    <div class="log-details">Bird activity monitoring completed</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">12/08/2025</div>
+                    <div class="log-details">Soil moisture analysis completed</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">11/08/2025</div>
+                    <div class="log-details">Crop health assessment completed</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">10/08/2025</div>
+                    <div class="log-details">Weather monitoring system updated</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">09/08/2025</div>
+                    <div class="log-details">Irrigation schedule optimized</div>
+                </li>
+                
+                <li class="log-entry">
+                    <div class="log-date">08/08/2025</div>
+                    <div class="log-details">New sensors installed in Zone A</div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- AI Suggestions -->
+        <div class="ai-suggestions fade-in-up">
+            <div class="ai-header">
+                <i class="fas fa-lightbulb"></i>
+                <h3>AI SUGGESTIONS</h3>
+            </div>
+            
+            <ul class="suggestion-list">
+                <li class="suggestion-item">
+                    <span class="suggestion-text">Water Patch 2 More</span>
+                </li>
+                <li class="suggestion-item">
+                    <span class="suggestion-text">Sprinkle Pesticides</span>
+                </li>
+                <li class="suggestion-item">
+                    <span class="suggestion-text">Test Patch 3 for Disease</span>
+                </li>
+                <li class="suggestion-item">
+                    <span class="suggestion-text">Monitor weather conditions</span>
+                </li>
+                <li class="suggestion-item">
+                    <span class="suggestion-text">Adjust irrigation schedule</span>
+                </li>
+                <li class="suggestion-item">
+                    <span class="suggestion-text">Check bird deterrent system</span>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        // Update current time
+        function updateCurrentTime() {
+            const now = new Date();
+            const hours = now.getHours();
+            let timeString = '';
+            
+            if (hours < 12) {
+                timeString = hours + ' AM';
+            } else if (hours === 12) {
+                timeString = '12 PM';
+            } else {
+                timeString = (hours - 12) + ' PM';
+            }
+            
+            document.getElementById('currentTime').textContent = timeString;
+            
+            // Calculate time ago (simplified)
+            const minutes = now.getMinutes();
+            if (minutes < 30) {
+                document.getElementById('timeAgo').textContent = 'JUST NOW';
+            } else if (minutes < 60) {
+                document.getElementById('timeAgo').textContent = '30 MINUTES AGO';
+            } else {
+                document.getElementById('timeAgo').textContent = '1 HOUR AGO';
+            }
+        }
+
+        // Update time every minute
+        updateCurrentTime();
+        setInterval(updateCurrentTime, 60000);
+
+        // Show today details
+        function showTodayDetails() {
+            alert('Today\'s detailed log will be displayed here');
+        }
+
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe all sections for animation
+        document.querySelectorAll('.fade-in-up').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(30px)';
+            section.style.transition = 'all 0.6s ease-out';
+            observer.observe(section);
+        });
+
+        // Add click effects to log entries
+        document.querySelectorAll('.log-entry').forEach(entry => {
+            entry.addEventListener('click', function() {
+                // Add visual feedback
+                this.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
+            });
+        });
+    </script>
 </body>
 </html>
