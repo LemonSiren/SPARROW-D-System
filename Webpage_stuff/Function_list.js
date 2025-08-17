@@ -424,7 +424,7 @@ function initializeSparrowSystem() {
     
     // Add theme toggle button to header if it exists
     const header = document.querySelector('.header');
-    if (header) {
+    if (header && !header.querySelector('.theme-toggle')) {
         const themeToggle = document.createElement('button');
         themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
         themeToggle.className = 'theme-toggle';
