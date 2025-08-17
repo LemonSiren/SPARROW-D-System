@@ -30,6 +30,7 @@ body {
     position: sticky;
     top: 0;
     z-index: 100;
+    transition: opacity 0.5s ease;
 }
 
 .logo {
@@ -52,6 +53,12 @@ body {
     border-radius: 20px;
     font-size: 0.875rem;
     font-weight: 500;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
 }
 
 /* ===== MAIN CONTENT LAYOUT ===== */
@@ -540,7 +547,13 @@ body {
 }
 
 .fade-in-up {
-    animation: fadeInUp 0.6s ease-out;
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s ease-out;
+}
+.fade-in-up.visible {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 /* ===== RESPONSIVE DESIGN ===== */
@@ -862,4 +875,29 @@ body {
     .main-content {
         padding: 1.5rem;
     }
+}
+
+.clear-btn {
+    background: rgba(239, 68, 68, 0.8);
+    color: white;
+    border: none;
+    padding: 0.5rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+.header-fade {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
+.header {
+    transition: transform 0.3s ease;
+}
+
+.header.scroll-away {
+    transform: translateY(-100%);
 }
