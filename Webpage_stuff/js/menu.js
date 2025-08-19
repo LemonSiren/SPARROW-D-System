@@ -49,12 +49,12 @@ class MenuManager {
     setupTouchGestures() {
         document.addEventListener('touchstart', (event) => {
             this.touchStartX = event.changedTouches[0].screenX;
-        });
+        }, { passive: true });
 
         document.addEventListener('touchend', (event) => {
             this.touchEndX = event.changedTouches[0].screenX;
             this.handleSwipe();
-        });
+        }, { passive: true });
     }
 
     openMenu() {
@@ -79,7 +79,8 @@ class MenuManager {
     }
 
     handleOutsideClick(event) {
-        if (this.sidemenu && !this.sidemenu.contains(event.target) && 
+        if (!this.sidemenu || !this.sidemenu.classList.contains('open')) return;
+        if (!this.sidemenu.contains(event.target) && 
             this.openMenuBtn && !this.openMenuBtn.contains(event.target)) {
             this.closeMenu();
         }
@@ -92,7 +93,7 @@ class MenuManager {
     }
 
     handleResize() {
-        if (window.innerWidth > 768) {
+        if (window.innerWidth > 768 && this.sidemenu && this.sidemenu.classList.contains('open')) {
             this.closeMenu();
         }
     }

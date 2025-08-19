@@ -24,8 +24,13 @@ class NotificationManager {
     }
 
     setupEventListeners() {
-        // Add click event listeners to all notification close buttons
-        document.addEventListener('click', (event) => this.handleCloseClick(event));
+        // Delegate close button clicks
+        document.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target && target.classList && target.classList.contains('notification-close')) {
+                this.handleCloseClick(event);
+            }
+        });
 
         // Auto-remove notifications after timeout
         this.setupAutoRemoval();
@@ -41,6 +46,18 @@ class NotificationManager {
     }
 
     setupAutoRemoval() {
+        if (typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            // Respect reduced motion: remove instantly without animation
+            setTimeout(() => {
+                const notifications = document.querySelectorAll('.notification');
+                notifications.forEach(notification => {
+                    if (notification.parentNode) notification.remove();
+                });
+            }, this.autoRemoveTimeout);
+            return;
+        }
+
         setTimeout(() => {
             const notifications = document.querySelectorAll('.notification');
             notifications.forEach(notification => {
@@ -62,6 +79,13 @@ class NotificationManager {
     }
 
     animateOut(notificationElement) {
+        if (!notificationElement) return;
+        // Skip animations for reduced motion
+        if (typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            if (notificationElement.parentNode) notificationElement.remove();
+            return;
+        }
         notificationElement.style.transform = 'translateX(100%)';
         notificationElement.style.opacity = '0';
         

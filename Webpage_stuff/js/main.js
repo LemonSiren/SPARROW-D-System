@@ -159,6 +159,8 @@ class SparrowApp {
 
 // Initialize the application when the script loads
 let sparrowApp = null;
+let initializeAttempts = 0;
+const MAX_INITIALIZE_ATTEMPTS = 50; // ~5s with 100ms backoff
 
 // Wait for all modules to load
 function initializeApp() {
@@ -173,8 +175,13 @@ function initializeApp() {
         
         console.log('SPARROW-DS Application ready');
     } else {
-        // Retry after a short delay
-        setTimeout(initializeApp, 100);
+        // Retry after a short delay with cap
+        if (initializeAttempts < MAX_INITIALIZE_ATTEMPTS) {
+            initializeAttempts += 1;
+            setTimeout(initializeApp, 100);
+        } else {
+            console.warn('SPARROW-DS Application: modules not available after retries');
+        }
     }
 }
 

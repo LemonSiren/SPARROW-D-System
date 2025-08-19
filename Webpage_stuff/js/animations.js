@@ -11,12 +11,21 @@ class AnimationManager {
             rootMargin: '0px 0px -50px 0px'
         };
         
+        // Header auto-hide state
+        this.headerEl = null;
+        this.mainContentEl = null;
+        this.headerHeight = 0;
+        this.lastScrollY = 0;
+        this.scrollTicking = false;
+        this.hideTolerance = 5;
+        
         this.init();
     }
 
     init() {
         this.setupIntersectionObserver();
         this.setupScrollAnimations();
+        this.setupHeaderAutoHide();
     }
 
     setupIntersectionObserver() {
@@ -30,8 +39,17 @@ class AnimationManager {
     }
 
     setupScrollAnimations() {
-        // Observe all sections for animation
+        // Respect reduced motion
+        const prefersReduced = typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
         document.querySelectorAll('.fade-in-up').forEach(section => {
+            if (prefersReduced) {
+                // Apply final styles without animation
+                section.style.opacity = '1';
+                section.style.transform = 'none';
+                return;
+            }
             this.prepareElement(section);
             this.observer.observe(section);
         });
@@ -51,18 +69,10 @@ class AnimationManager {
     // Add click effects to interactive elements
     setupClickEffects() {
         // Log items
-        document.querySelectorAll('.log-item').forEach(entry => {
-            entry.addEventListener('click', (event) => this.handleClickEffect(event));
-        });
-
-        // Suggestion items
-        document.querySelectorAll('.suggestion-item').forEach(entry => {
-            entry.addEventListener('click', (event) => this.handleClickEffect(event));
-        });
-
-        // Data cards
-        document.querySelectorAll('.data-card').forEach(entry => {
-            entry.addEventListener('click', (event) => this.handleClickEffect(event));
+        document.addEventListener('click', (event) => {
+            const target = event.target.closest('.log-item, .suggestion-item, .data-card');
+            if (!target) return;
+            this.handleClickEffect({ currentTarget: target });
         });
     }
 
@@ -80,6 +90,13 @@ class AnimationManager {
     // Fade in animation for elements
     fadeIn(element, duration = 600) {
         if (element) {
+            const prefersReduced = typeof window.matchMedia === 'function' &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                element.style.opacity = '1';
+                element.style.transform = 'none';
+                return;
+            }
             element.style.opacity = '0';
             element.style.transform = 'translateY(30px)';
             element.style.transition = `all ${duration}ms ease-out`;
@@ -95,6 +112,13 @@ class AnimationManager {
     // Fade out animation for elements
     fadeOut(element, duration = 600) {
         if (element) {
+            const prefersReduced = typeof window.matchMedia === 'function' &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                element.style.opacity = '0';
+                element.style.transform = 'none';
+                return;
+            }
             element.style.transition = `all ${duration}ms ease-out`;
             element.style.opacity = '0';
             element.style.transform = 'translateY(30px)';
@@ -104,6 +128,12 @@ class AnimationManager {
     // Slide in from right animation
     slideInRight(element, duration = 300) {
         if (element) {
+            const prefersReduced = typeof window.matchMedia === 'function' &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                element.style.transform = 'none';
+                return;
+            }
             element.style.transform = 'translateX(100%)';
             element.style.transition = `all ${duration}ms ease-out`;
             
@@ -116,6 +146,12 @@ class AnimationManager {
     // Slide out to right animation
     slideOutRight(element, duration = 300) {
         if (element) {
+            const prefersReduced = typeof window.matchMedia === 'function' &&
+                window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            if (prefersReduced) {
+                element.style.transform = 'none';
+                return;
+            }
             element.style.transition = `all ${duration}ms ease-out`;
             element.style.transform = 'translateX(100%)';
         }
@@ -181,6 +217,49 @@ class AnimationManager {
     setupAllAnimations() {
         this.addCustomAnimations();
         this.setupClickEffects();
+    }
+
+    // Auto-hide header on scroll down, show on scroll up
+    setupHeaderAutoHide() {
+        this.headerEl = document.querySelector('.header');
+        this.mainContentEl = document.querySelector('.main-content');
+        if (!this.headerEl || !this.mainContentEl) return;
+
+        // Respect reduced motion
+        const prefersReduced = typeof window.matchMedia === 'function' &&
+            window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (prefersReduced) return;
+
+        const updateHeaderMetrics = () => {
+            this.headerHeight = this.headerEl.offsetHeight || 0;
+            this.mainContentEl.style.marginTop = `${this.headerHeight}px`;
+        };
+
+        updateHeaderMetrics();
+        window.addEventListener('resize', updateHeaderMetrics, { passive: true });
+
+        this.lastScrollY = window.scrollY;
+
+        const onScroll = () => {
+            if (this.scrollTicking) return;
+            this.scrollTicking = true;
+            requestAnimationFrame(() => {
+                const currentY = window.scrollY;
+                const scrolledDown = currentY > this.lastScrollY + this.hideTolerance;
+                const scrolledUp = currentY < this.lastScrollY - this.hideTolerance;
+
+                if (scrolledDown) {
+                    this.headerEl.classList.add('hide');
+                } else if (scrolledUp) {
+                    this.headerEl.classList.remove('hide');
+                }
+
+                this.lastScrollY = currentY;
+                this.scrollTicking = false;
+            });
+        };
+
+        window.addEventListener('scroll', onScroll, { passive: true });
     }
 
     // Public methods for external use
