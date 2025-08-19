@@ -895,9 +895,14 @@ body {
     transition: opacity 0.5s ease;
 }
 .header {
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, opacity 0.3s ease;
 }
 
 .header.scroll-away {
     transform: translateY(-100%);
+}
+
+.header.hide {
+    transform: translateY(-100%);
+    opacity: 0.5;
 }
